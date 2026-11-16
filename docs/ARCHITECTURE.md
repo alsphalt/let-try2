@@ -41,25 +41,35 @@ Rules:
 
 ### `src/server/db/index.ts`
 
-- `DatabaseAdapter` — `healthCheck()` + parameterised `query<T>()`.
-- `registerDatabaseAdapter()` binds a driver once at startup.
-- `getDatabase()` explains exactly what is missing instead of returning a mock.
+- Owns one SQLite connection (`better-sqlite3`) cached on `globalThis`, so hot
+  reloads and route handlers share a handle.
+- Enables WAL, foreign keys and a 5s busy timeout; creates the schema
+  idempotently and tracks it with `PRAGMA user_version`.
+- Tables: `users`, `sessions`, `password_reset_tokens` with unique keys and
+  indexes on expiry and ownership.
+- `DATABASE_PATH` selects the file (default `./data/darknote-hosts.db`).
 
-**To bind Postgres (Stage 02):** add a driver (e.g. Prisma or `pg`), implement
-`DatabaseAdapter`, register it from an init module used by server code, add
-migrations, and define workspace/bot/API-key tables with workspace-scoped
-foreign keys and indexes.
+**Moving to Postgres:** keep the repository functions in `users.ts` /
+`session.ts` as the seam — replace their SQL with a Postgres client and add
+workspace-scoped tables. Do not persist SQLite files on ephemeral hosts.
 
-### `src/server/auth/index.ts`
+### `src/server/auth/*`
 
-- `Session` is the only identity shape the app knows.
-- `AuthProvider` covers `signIn`, `signOut`, `getSession`, `requireSession`.
-- Without a provider, `getSession()` returns `null` and `requireSession()` throws.
+- `password.ts` — scrypt (`N=16384, r=8, p=1`) with a 16-byte salt; parameters
+  travel with the hash, comparison is constant-time.
+- `users.ts` — user lookup by id/email/username, insert and password update.
+  Email and username uniqueness is enforced by the database.
+- `session.ts` — 256-bit token, SHA-256 stored server-side, HTTP-only cookie,
+  30-day expiry, `Secure` when `APP_URL` is HTTPS.
+- `reset.ts` — single-use reset tokens (30-minute expiry, hashed at rest).
+- `mailer.ts` — SMTP transport; local fallback returns the reset link only when
+  `AUTH_DEV_RESET_LINKS=true` or in development without SMTP.
+- `index.ts` — the only auth surface route handlers import.
 
-**To bind auth (Stage 02):** implement the provider against the chosen vendor or
-a credentials flow, set an HTTP-only, `Secure`, `SameSite=Lax` session cookie,
-rotate `AUTH_SECRET`, add CSRF protection on mutating routes, and gate every
-`(app)` route group in its layout.
+**Route protection:** `(app)/layout.tsx` resolves the session server-side and
+redirects to `/login` when absent. `/login` and `/register` redirect signed-in
+users to `/dashboard`. Mutating auth routes reject cross-site origins and all
+validation is re-run on the server.
 
 ### `src/server/bots/index.ts`
 
@@ -85,12 +95,13 @@ and expose lifecycle endpoints that require a session plus workspace role.
 {
   "service": "darknote-hosts",
   "status": "ok",
-  "version": "0.1.0",
-  "stage": "foundation",
+  "version": "0.2.0",
+  "stage": "identity",
   "checks": {
     "api": "ok",
-    "database": "not_configured",
-    "auth": "not_configured",
+    "database": "ok",
+    "auth": "ok",
+    "email": "not_configured",
     "botRuntime": "not_configured"
   }
 }
@@ -115,8 +126,10 @@ mint/amber/rose only for state.
 
 - No secrets in the repository; `.env*` is git-ignored, `.env.example` is not.
 - `server-only` guards every module under `src/server`.
-- Auth and data access are unbound, so no route currently mutates state.
-- Dashboard actions that would mutate state are disabled rather than simulated.
+- Passwords use scrypt with per-user salts; reset tokens are hashed and
+  single-use; sessions are revocable and expire after 30 days.
+- Auth mutations check the request origin; validation always runs server-side.
+- Bot, API and wallet actions remain disabled rather than simulated.
 
 ## Deliberate omissions
 

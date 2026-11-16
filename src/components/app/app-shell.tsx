@@ -7,18 +7,25 @@ import { useState } from "react";
 import { AppMobileDrawer } from "@/components/app/app-mobile-drawer";
 import { AppSidebar } from "@/components/app/app-sidebar";
 import { AppTopbar } from "@/components/app/app-topbar";
+import type { SessionUser } from "@/lib/auth-types";
 import { site } from "@/lib/site";
 
-export function AppShell({ children }: { children: ReactNode }) {
+export function AppShell({
+  children,
+  user,
+}: {
+  children: ReactNode;
+  user: SessionUser;
+}) {
   const pathname = usePathname();
   const [navOpen, setNavOpen] = useState(false);
 
   return (
     <div className="flex min-h-dvh bg-ink-950">
-      <AppSidebar pathname={pathname} />
+      <AppSidebar pathname={pathname} user={user} />
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <AppTopbar onOpenNav={() => setNavOpen(true)} />
+        <AppTopbar onOpenNav={() => setNavOpen(true)} user={user} />
 
         <main className="relative flex-1">
           <div
@@ -33,7 +40,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <footer className="border-t border-[var(--hairline)] px-4 py-4 sm:px-6 lg:px-8">
           <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-2">
             <p className="font-mono text-[0.56rem] uppercase tracking-[0.14em] text-ash/70">
-              {site.name} · v{site.version} · foundation
+              {site.name} · v{site.version} · identity
             </p>
             <div className="flex items-center gap-4">
               <Link
@@ -56,6 +63,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <AppMobileDrawer
         open={navOpen}
         pathname={pathname}
+        user={user}
         onClose={() => setNavOpen(false)}
       />
     </div>

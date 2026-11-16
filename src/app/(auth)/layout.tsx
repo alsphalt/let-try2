@@ -21,6 +21,9 @@ const highlights = [
   },
 ];
 
+// Signed-in visitors are redirected before this shell renders.
+export const instant = false;
+
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
     <div className="grid min-h-dvh lg:grid-cols-[1.02fr_0.98fr]">
@@ -64,7 +67,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
 
         <div className="relative flex items-center gap-2.5 font-mono text-[0.6rem] uppercase tracking-[0.16em] text-ash">
           <span className="h-1.5 w-1.5 rounded-full bg-mint" />
-          Stage 01 · foundation build
+          Secure sessions · authentication online
         </div>
       </aside>
 

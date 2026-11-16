@@ -1,7 +1,6 @@
 import { connection, NextResponse } from "next/server";
 import { capabilities, serverEnv } from "@/server/config/env";
-import { isDatabaseBound } from "@/server/db";
-import { isAuthBound } from "@/server/auth";
+import { databaseHealth } from "@/server/db";
 import { site } from "@/lib/site";
 
 /**
@@ -11,22 +10,22 @@ import { site } from "@/lib/site";
 export async function GET() {
   await connection();
 
-  const database = isDatabaseBound() ? "ok" : capabilities.database();
-  const auth = isAuthBound() ? "ok" : capabilities.auth();
+  const database = databaseHealth() ? "ok" : "error";
 
   return NextResponse.json(
     {
       service: "darknote-hosts",
       status: "ok",
       version: site.version,
-      stage: "foundation",
+      stage: "identity",
       environment: serverEnv.nodeEnv,
       uptimeSeconds: Math.round(process.uptime()),
       timestamp: new Date().toISOString(),
       checks: {
         api: "ok",
         database,
-        auth,
+        auth: capabilities.auth(),
+        email: capabilities.email(),
         botRuntime: capabilities.botRuntime(),
       },
     },

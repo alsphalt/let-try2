@@ -16,7 +16,7 @@ export function CtaBand() {
             }}
           />
           <div className="relative">
-            <p className="eyebrow justify-center">Stage 01 complete</p>
+            <p className="eyebrow justify-center">Accounts are live</p>
             <h2 className="mx-auto mt-4 max-w-2xl text-balance text-3xl font-semibold tracking-[-0.03em] text-chalk sm:text-4xl">
               The foundation is in place. The runtime comes next.
             </h2>

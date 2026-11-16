@@ -3,9 +3,9 @@ import "server-only";
 /**
  * Server-side configuration.
  *
- * Nothing here is required at boot in Stage 01 — the app runs with an
- * unconfigured backend so the foundation can be reviewed safely. Each
- * capability reports its own state instead of failing the whole process.
+ * Authentication and SQLite persistence work out of the box. External
+ * capabilities (SMTP, bot runtime, billing) stay optional and report their
+ * own state instead of failing the whole process.
  */
 
 function optional(key: string): string | null {
@@ -16,9 +16,8 @@ function optional(key: string): string | null {
 export const serverEnv = {
   nodeEnv: process.env.NODE_ENV ?? "development",
   appUrl: optional("APP_URL") ?? "http://localhost:3000",
-  databaseUrl: optional("DATABASE_URL"),
-  authProvider: optional("AUTH_PROVIDER"),
-  authSecret: optional("AUTH_SECRET"),
+  databasePath: optional("DATABASE_PATH"),
+  smtpHost: optional("SMTP_HOST"),
   botRuntimeUrl: optional("BOT_RUNTIME_URL"),
   redisUrl: optional("REDIS_URL"),
 } as const;
@@ -26,13 +25,14 @@ export const serverEnv = {
 export type CapabilityState = "ok" | "not_configured" | "not_connected";
 
 export const capabilities = {
-  database(): CapabilityState {
-    return serverEnv.databaseUrl ? "not_connected" : "not_configured";
-  },
   auth(): CapabilityState {
-    return serverEnv.authProvider && serverEnv.authSecret
-      ? "not_connected"
-      : "not_configured";
+    return "ok";
+  },
+  database(): CapabilityState {
+    return "ok";
+  },
+  email(): CapabilityState {
+    return serverEnv.smtpHost ? "ok" : "not_configured";
   },
   botRuntime(): CapabilityState {
     return serverEnv.botRuntimeUrl ? "not_connected" : "not_configured";

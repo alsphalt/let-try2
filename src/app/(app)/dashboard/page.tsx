@@ -5,7 +5,6 @@ import {
   ArrowUpRight,
   Bot,
   Braces,
-  CircleDashed,
   Mail,
   Wallet,
 } from "lucide-react";
@@ -43,19 +42,16 @@ export default function DashboardPage() {
       <PageHeader
         eyebrow="Control plane"
         title="Dashboard"
-        description="Your workspace at a glance. The layout is live; runtime, identity and billing are still to be connected."
+        description="Your workspace at a glance. Identity and sessions are live; runtime and billing are still to be connected."
         badge={
-          <Badge tone="warning">
-            <CircleDashed className="h-2.5 w-2.5" />
-            Foundation workspace
-          </Badge>
+          <Badge tone="outline">Personal workspace</Badge>
         }
       />
 
       <Notice>
-        This is the navigation foundation. Bot hosting, API access and wallet
-        operations are not implemented yet, so every section shows a real empty
-        or coming-soon state.
+        Your account and session are live. Bot hosting, API access, wallet and
+        billing are not implemented yet, so those sections show real empty or
+        coming-soon states.
       </Notice>
 
       <div className="grid gap-3 sm:grid-cols-3">

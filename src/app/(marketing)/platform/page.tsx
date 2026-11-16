@@ -63,15 +63,15 @@ const foundation = [
   },
   {
     area: "Authentication",
-    location: "src/server/auth · /login · /register",
-    status: "Scaffolded",
-    tone: "warning" as const,
+    location: "src/server/auth · SQLite sessions",
+    status: "Implemented",
+    tone: "success" as const,
   },
   {
-    area: "Database adapter",
-    location: "src/server/db",
-    status: "Scaffolded",
-    tone: "warning" as const,
+    area: "Database persistence",
+    location: "src/server/db · SQLite",
+    status: "Implemented",
+    tone: "success" as const,
   },
   {
     area: "Bot repository & runtime contract",
@@ -97,8 +97,8 @@ const stages = [
   {
     id: "02",
     title: "Identity & data",
-    copy: "Bind authentication, connect Postgres and introduce workspaces, sessions and API keys.",
-    state: "next",
+    copy: "Registration, sign-in and scrypt-hashed accounts are live on SQLite. Workspace roles and API keys follow.",
+    state: "current",
   },
   {
     id: "03",
@@ -124,7 +124,7 @@ export default function PlatformPage() {
             today and where each capability is headed.
           </p>
           <div className="mt-7 flex flex-wrap items-center gap-2">
-            <Badge tone="brand">Stage 01 · Foundation</Badge>
+            <Badge tone="brand">Stage 02 · Identity live</Badge>
             <Badge tone="outline">Next.js 16 · React 19</Badge>
             <Badge tone="outline">TypeScript strict</Badge>
           </div>
@@ -176,7 +176,7 @@ export default function PlatformPage() {
             <SectionHeading
               eyebrow="Foundation status"
               title="What is real in this build."
-              description="No capability is marked complete until it is wired end to end. Scaffolded means interfaces exist; the provider or driver is intentionally unbound."
+              description="No capability is marked complete until it is wired end to end. Scaffolded means the interface exists but its provider is not connected yet."
             />
 
             <div className="panel mt-9 overflow-hidden">
@@ -246,8 +246,10 @@ export default function PlatformPage() {
                       <CircleCheck className="h-2.5 w-2.5" />
                       Complete
                     </Badge>
+                  ) : stage.state === "current" ? (
+                    <Badge tone="brand">Live</Badge>
                   ) : stage.state === "next" ? (
-                    <Badge tone="brand">Next</Badge>
+                    <Badge tone="outline">Next</Badge>
                   ) : (
                     <Badge tone="outline">Queued</Badge>
                   )}

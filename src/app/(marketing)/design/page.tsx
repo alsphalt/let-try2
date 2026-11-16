@@ -223,7 +223,7 @@ export default function DesignPage() {
             </SpecRow>
             <SpecRow label="Mono label" spec="10 / 0.18em">
               <p className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-violet-300">
-                Stage 01 · Foundation
+                Stage 02 · Identity
               </p>
             </SpecRow>
           </div>
@@ -264,7 +264,7 @@ export default function DesignPage() {
                 Badges & status
               </p>
               <div className="mt-5 flex flex-wrap items-center gap-2.5">
-                <Badge tone="brand">Stage 01</Badge>
+                <Badge tone="brand">Stage 02</Badge>
                 <Badge tone="success">
                   <CircleCheck className="h-2.5 w-2.5" />
                   Operational

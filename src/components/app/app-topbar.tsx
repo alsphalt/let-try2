@@ -1,12 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import {
   Bell,
   ChevronDown,
-  Info,
+  LoaderCircle,
   LogOut,
   Menu,
   Settings,
@@ -16,16 +16,31 @@ import { LogoMark } from "@/components/brand/logo";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/cn";
 import { pageTitleFor } from "@/lib/app-nav";
+import type { SessionUser } from "@/lib/auth-types";
 import { site } from "@/lib/site";
 
 type MenuName = "bell" | "profile" | null;
 
-export function AppTopbar({ onOpenNav }: { onOpenNav: () => void }) {
+function initialsFor(username: string): string {
+  const clean = username.replace(/[^a-zA-Z0-9]/g, "");
+  return (clean.slice(0, 2) || "DN").toUpperCase();
+}
+
+export function AppTopbar({
+  onOpenNav,
+  user,
+}: {
+  onOpenNav: () => void;
+  user: SessionUser;
+}) {
   const pathname = usePathname();
+  const router = useRouter();
   const title = pageTitleFor(pathname);
   const [menu, setMenu] = useState<MenuName>(null);
-  const [logoutNote, setLogoutNote] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
+  const [logoutError, setLogoutError] = useState<string | null>(null);
   const clusterRef = useRef<HTMLDivElement>(null);
+  const initials = initialsFor(user.username);
 
   useEffect(() => {
     if (!menu) return;
@@ -44,6 +59,29 @@ export function AppTopbar({ onOpenNav }: { onOpenNav: () => void }) {
       document.removeEventListener("keydown", onKey);
     };
   }, [menu]);
+
+  async function handleLogout() {
+    if (loggingOut) return;
+    setLoggingOut(true);
+    setLogoutError(null);
+    try {
+      const response = await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "same-origin",
+      });
+      if (!response.ok) {
+        setLogoutError("Could not sign out. Please try again.");
+        return;
+      }
+      setMenu(null);
+      router.replace("/login");
+      router.refresh();
+    } catch {
+      setLogoutError("Could not reach the server. Please try again.");
+    } finally {
+      setLoggingOut(false);
+    }
+  }
 
   return (
     <header className="sticky top-0 z-40 border-b border-[var(--hairline)] bg-ink-950/85 backdrop-blur-xl">
@@ -69,7 +107,7 @@ export function AppTopbar({ onOpenNav }: { onOpenNav: () => void }) {
 
           <nav aria-label="Breadcrumb" className="hidden min-w-0 md:block">
             <ol className="flex items-center gap-2 text-[0.78rem]">
-              <li className="text-ash">Personal</li>
+              <li className="truncate text-ash">{user.username}</li>
               <li aria-hidden className="text-ash/40">
                 /
               </li>
@@ -143,7 +181,7 @@ export function AppTopbar({ onOpenNav }: { onOpenNav: () => void }) {
             <button
               type="button"
               onClick={() => {
-                setLogoutNote(false);
+                setLogoutError(null);
                 setMenu((current) => (current === "profile" ? null : "profile"));
               }}
               aria-label="Open profile menu"
@@ -157,14 +195,14 @@ export function AppTopbar({ onOpenNav }: { onOpenNav: () => void }) {
               )}
             >
               <span className="flex h-8 w-8 items-center justify-center rounded-full border border-violet-400/25 bg-violet-500/15 font-mono text-[0.6rem] text-violet-200">
-                DN
+                {initials}
               </span>
-              <span className="hidden text-left sm:block">
-                <span className="block text-[0.72rem] font-medium leading-tight text-chalk">
-                  Preview account
+              <span className="hidden max-w-[9rem] text-left sm:block">
+                <span className="block truncate text-[0.72rem] font-medium leading-tight text-chalk">
+                  {user.username}
                 </span>
-                <span className="block font-mono text-[0.52rem] uppercase tracking-[0.1em] text-ash">
-                  not signed in
+                <span className="block truncate font-mono text-[0.52rem] tracking-[0.04em] text-ash">
+                  {user.email}
                 </span>
               </span>
               <ChevronDown
@@ -182,15 +220,15 @@ export function AppTopbar({ onOpenNav }: { onOpenNav: () => void }) {
                 className="pop-in absolute right-0 top-full mt-2 w-64 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-[var(--hairline-strong)] bg-ink-850 shadow-[0_24px_60px_-20px_rgba(0,0,0,0.9)]"
               >
                 <div className="flex items-center gap-3 border-b border-[var(--hairline)] px-4 py-3.5">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-full border border-violet-400/25 bg-violet-500/15 font-mono text-[0.62rem] text-violet-200">
-                    DN
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-violet-400/25 bg-violet-500/15 font-mono text-[0.62rem] text-violet-200">
+                    {initials}
                   </span>
                   <div className="min-w-0">
                     <p className="truncate text-[0.78rem] font-medium text-chalk">
-                      Preview account
+                      {user.username}
                     </p>
-                    <p className="truncate font-mono text-[0.55rem] uppercase tracking-[0.08em] text-ash">
-                      authentication not connected
+                    <p className="truncate text-[0.66rem] text-ash">
+                      {user.email}
                     </p>
                   </div>
                 </div>
@@ -209,31 +247,33 @@ export function AppTopbar({ onOpenNav }: { onOpenNav: () => void }) {
                   <button
                     type="button"
                     role="menuitem"
-                    onClick={() => setLogoutNote(true)}
-                    className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-[0.8rem] text-mist transition-colors hover:bg-rose/[0.07] hover:text-rose"
+                    onClick={() => void handleLogout()}
+                    disabled={loggingOut}
+                    className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-[0.8rem] text-mist transition-colors hover:bg-rose/[0.07] hover:text-rose disabled:opacity-60"
                   >
-                    <LogOut className="h-4 w-4 text-ash" />
-                    Logout
+                    {loggingOut ? (
+                      <LoaderCircle className="h-4 w-4 animate-spin text-ash" />
+                    ) : (
+                      <LogOut className="h-4 w-4 text-ash" />
+                    )}
+                    {loggingOut ? "Signing out…" : "Logout"}
                   </button>
                 </div>
 
-                {logoutNote ? (
+                {logoutError ? (
                   <div
-                    role="status"
-                    aria-live="polite"
-                    className="border-t border-[var(--hairline)] bg-white/[0.02] px-4 py-3"
+                    role="alert"
+                    className="border-t border-[var(--hairline)] bg-rose/[0.05] px-4 py-2.5"
                   >
-                    <p className="flex gap-2 text-[0.66rem] leading-relaxed text-ash">
-                      <Info className="mt-0.5 h-3 w-3 shrink-0 text-amber" />
-                      No session to end yet — sign-in arrives when
-                      authentication is connected.
+                    <p className="text-[0.66rem] leading-relaxed text-rose">
+                      {logoutError}
                     </p>
                   </div>
                 ) : (
                   <div className="flex items-center gap-2 border-t border-[var(--hairline)] px-4 py-2.5">
                     <ShieldCheck className="h-3 w-3 text-violet-400" />
-                    <p className="font-mono text-[0.52rem] uppercase tracking-[0.1em] text-ash">
-                      {site.stage}
+                    <p className="truncate font-mono text-[0.52rem] uppercase tracking-[0.1em] text-ash">
+                      Secure session · {site.stage}
                     </p>
                   </div>
                 )}

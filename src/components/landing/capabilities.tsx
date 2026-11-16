@@ -51,7 +51,7 @@ const capabilities: Capability[] = [
     title: "Secure by design",
     description:
       "Encrypted credentials, expiring sessions and per-workspace access boundaries baked into the data model.",
-    stage: "Auth · next",
+    stage: "Auth · live",
   },
   {
     icon: Layers,

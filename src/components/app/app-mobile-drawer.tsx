@@ -4,17 +4,24 @@ import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { ArrowUpRight, X } from "lucide-react";
 import { AppNavLinks } from "@/components/app/app-nav-links";
-import { Logo, LogoMark } from "@/components/brand/logo";
+import { Logo } from "@/components/brand/logo";
 import { cn } from "@/lib/cn";
+import type { SessionUser } from "@/lib/auth-types";
 import { site } from "@/lib/site";
+
+function initialsFor(username: string): string {
+  return (username.replace(/[^a-zA-Z0-9]/g, "").slice(0, 2) || "DN").toUpperCase();
+}
 
 export function AppMobileDrawer({
   open,
   pathname,
+  user,
   onClose,
 }: {
   open: boolean;
   pathname: string;
+  user: SessionUser;
   onClose: () => void;
 }) {
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -93,11 +100,11 @@ export function AppMobileDrawer({
 
           <div className="mt-5 rounded-xl border border-[var(--hairline)] bg-white/[0.02] p-4">
             <p className="text-[0.7rem] font-medium text-chalk">
-              Foundation build
+              Accounts are live
             </p>
             <p className="mt-1 text-[0.65rem] leading-relaxed text-ash">
-              Layout and navigation are ready. Runtime features arrive in later
-              stages.
+              Registration and sessions are active. The bot runtime and billing
+              arrive in later stages.
             </p>
             <Link
               href="/platform"
@@ -112,16 +119,14 @@ export function AppMobileDrawer({
 
         <div className="border-t border-[var(--hairline)] p-3">
           <div className="flex items-center gap-2.5 rounded-lg border border-[var(--hairline)] bg-white/[0.02] px-3 py-2.5">
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-violet-500/20 bg-violet-500/10">
-              <LogoMark className="h-4 w-4" />
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-violet-500/25 bg-violet-500/15 font-mono text-[0.62rem] text-violet-200">
+              {initialsFor(user.username)}
             </span>
             <div className="min-w-0">
               <p className="truncate text-[0.72rem] font-medium text-chalk">
-                Personal workspace
+                {user.username}
               </p>
-              <p className="font-mono text-[0.52rem] uppercase tracking-[0.1em] text-ash">
-                preview · not provisioned
-              </p>
+              <p className="truncate text-[0.62rem] text-ash">{user.email}</p>
             </div>
           </div>
           <Link

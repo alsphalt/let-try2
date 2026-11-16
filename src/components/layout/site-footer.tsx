@@ -44,7 +44,7 @@ export function SiteFooter() {
         <div className="mt-12 flex flex-col gap-3 border-t border-[var(--hairline)] pt-6 text-xs text-ash sm:flex-row sm:items-center sm:justify-between">
           <p>© {site.name}. Independent platform.</p>
           <p className="font-mono tracking-[0.12em] text-ash/80">
-            v{site.version} · FOUNDATION
+            v{site.version} · IDENTITY
           </p>
         </div>
       </div>

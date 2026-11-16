@@ -9,8 +9,8 @@ export const site = {
   tagline: "Host bots that never sleep.",
   description:
     "DARKNOTE HOSTS is an always-on hosting platform for messaging bots and internal automations — isolated workspaces, a clean API and a dashboard built for operators.",
-  version: "0.1.0",
-  stage: "Stage 01 — Foundation",
+  version: "0.2.0",
+  stage: "Stage 02 — Identity",
   url: "http://localhost:3000",
 } as const;
 

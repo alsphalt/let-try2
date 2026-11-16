@@ -27,8 +27,8 @@ const labels: Array<{
   detail: string;
 }> = [
   { key: "api", name: "API surface", detail: "/api/health" },
-  { key: "database", name: "Database", detail: "adapter not bound" },
-  { key: "auth", name: "Auth provider", detail: "not configured" },
+  { key: "database", name: "Database", detail: "sqlite · local" },
+  { key: "auth", name: "Auth provider", detail: "sessions · scrypt" },
   { key: "botRuntime", name: "Bot runtime", detail: "not provisioned" },
 ];
 
