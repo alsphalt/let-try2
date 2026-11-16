@@ -64,8 +64,10 @@
   --header-height: 4.5rem;
 }
 
-* {
-  border-color: var(--hairline);
+@layer base {
+  * {
+    border-color: var(--hairline);
+  }
 }
 
 html {
@@ -235,6 +237,22 @@ body {
 .rise-2 { animation-delay: 140ms; }
 .rise-3 { animation-delay: 220ms; }
 .rise-4 { animation-delay: 300ms; }
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-5px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.pop-in {
+  animation: pop-in 170ms var(--ease-out-soft) both;
+  transform-origin: top right;
+}
 
 @keyframes pulse-dot {
   0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(74, 222, 155, 0.5); }

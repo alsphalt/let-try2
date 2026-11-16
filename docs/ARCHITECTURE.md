@@ -59,7 +59,7 @@ foreign keys and indexes.
 **To bind auth (Stage 02):** implement the provider against the chosen vendor or
 a credentials flow, set an HTTP-only, `Secure`, `SameSite=Lax` session cookie,
 rotate `AUTH_SECRET`, add CSRF protection on mutating routes, and gate every
-`/dashboard` route in its layout.
+`(app)` route group in its layout.
 
 ### `src/server/bots/index.ts`
 

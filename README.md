@@ -53,7 +53,12 @@ npm start
 | `/` | Landing page — brand, capabilities, architecture, design preview |
 | `/platform` | Platform map and an honest foundation-status table |
 | `/design` | Living design system (colour, type, components, motion) |
-| `/dashboard` | Control-plane shell with truthful empty states |
+| `/dashboard` | Workspace overview with live platform status |
+| `/bot` | Bot section shell with a real empty state |
+| `/api` | API section — Coming soon (with the live health endpoint linked) |
+| `/contact` | Contact layout with a non-sending form |
+| `/wallet` | Wallet section — Coming soon |
+| `/settings` | Account/workspace settings, reached from the profile menu |
 | `/login`, `/register` | Auth UI shells; no provider is connected |
 | `/api/health` | Real runtime health; reports unbound capabilities as pending |
 
@@ -64,7 +69,8 @@ src/
 ├── app/
 │   ├── (marketing)/          # Public site: landing, platform, design
 │   ├── (auth)/               # Split-screen auth shell
-│   ├── dashboard/            # App shell + overview
+│   ├── (app)/                # Application shell: dashboard, bot, api,
+│   │                         # contact, wallet, settings
 │   ├── api/health/           # Health endpoint
 │   ├── layout.tsx            # Root document, fonts, metadata
 │   ├── globals.css           # Design tokens + primitives
@@ -76,7 +82,7 @@ src/
 │   ├── ui/                   # Button, card, badge, field, section
 │   ├── landing/              # Landing sections, live status panel
 │   ├── auth/                 # Auth form
-│   └── dashboard/            # Reserved for dashboard widgets
+│   └── app/                  # Shell, sidebar, topbar, page primitives
 ├── lib/                      # Client-safe helpers and site metadata
 └── server/
     ├── config/env.ts         # Server-only configuration + capability states
@@ -117,6 +123,7 @@ capabilities.botRuntime();
 | --- | --- |
 | Branding, design system, responsive shell | Complete |
 | Marketing and auth surfaces | Complete (UI) |
+| Application shell, five-section navigation, profile and notifications | Complete (UI) |
 | Health endpoint | Complete (real) |
 | Auth provider, Postgres adapter | Scaffolded — interfaces only |
 | Bot repository / runtime | Scaffolded — interfaces only |
