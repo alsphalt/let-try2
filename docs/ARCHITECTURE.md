@@ -29,6 +29,23 @@ Rules:
 3. Route handlers are thin: parse, authorize, call a service, shape a response.
 4. Every module that touches the outside world sits behind an interface.
 
+## Entry flow
+
+```
+GET /login
+  ├─ valid session ──────────────► /dashboard
+  ├─ no dn_intro_seen cookie ────► /welcome
+  │                                   │ Get Started (sets cookie)
+  │                                   ▼
+  └────────────────────────────── /login → AuthForm → POST /api/auth/login
+```
+
+`/welcome` is a server component that reads the session and the `dn_sound`
+cookie, then hands off to a client experience for the animation and audio
+playback of an original `<audio>` asset. It never renders for authenticated users. The
+introduction is presentation only: it grants no access and is not a security
+boundary. `/login` remains responsible for the session check.
+
 ## Modules
 
 ### `src/server/config/env.ts`

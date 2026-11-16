@@ -86,11 +86,18 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
           </Link>
         </div>
         <div className="flex flex-1 items-center justify-center px-5 py-10 sm:px-8">
-          <div className="w-full max-w-[26rem]">{children}</div>
+          <div className="auth-enter w-full max-w-[26rem]">{children}</div>
         </div>
-        <p className="px-5 pb-6 text-center font-mono text-[0.6rem] uppercase tracking-[0.14em] text-ash/70 sm:px-8">
-          DARKNOTE HOSTS · independent platform
-        </p>
+        <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 px-5 pb-6 text-center font-mono text-[0.6rem] uppercase tracking-[0.14em] text-ash/70 sm:px-8">
+          <span>DARKNOTE HOSTS · independent platform</span>
+          <span aria-hidden className="text-ash/30">·</span>
+          <Link
+            href="/welcome"
+            className="transition-colors hover:text-violet-200"
+          >
+            Replay intro
+          </Link>
+        </div>
       </main>
     </div>
   );

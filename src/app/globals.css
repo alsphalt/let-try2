@@ -263,6 +263,145 @@ body {
   animation: pulse-dot 2.8s ease-in-out infinite;
 }
 
+
+/* ------------------------------------------------------------------
+   Introduction screen — cinematic entry
+   ------------------------------------------------------------------ */
+
+.intro-shell {
+  background:
+    radial-gradient(95% 70% at 50% 6%, rgba(109, 40, 217, 0.36), transparent 63%),
+    radial-gradient(70% 55% at 50% 108%, rgba(124, 77, 255, 0.18), transparent 68%),
+    radial-gradient(40% 40% at 50% 42%, rgba(139, 92, 246, 0.1), transparent 70%),
+    #040308;
+}
+
+.intro-grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.045;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+}
+
+.intro-orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(80px);
+  pointer-events: none;
+  animation: intro-drift 18s ease-in-out infinite alternate;
+}
+
+@keyframes intro-drift {
+  from { transform: translate3d(-3%, -2%, 0) scale(1); }
+  to { transform: translate3d(4%, 3%, 0) scale(1.08); }
+}
+
+@keyframes intro-mark {
+  0% {
+    opacity: 0;
+    transform: scale(0.72);
+    filter: blur(20px);
+  }
+  45% { opacity: 1; }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+}
+
+.intro-mark {
+  animation: intro-mark 1500ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  filter: drop-shadow(0 0 38px rgba(124, 77, 255, 0.45));
+}
+
+@keyframes intro-spin {
+  to { transform: rotate(360deg); }
+}
+
+.intro-orbit {
+  animation: intro-spin 26s linear infinite;
+}
+
+.intro-orbit-reverse {
+  animation: intro-spin 34s linear infinite reverse;
+}
+
+@keyframes intro-sweep {
+  0% {
+    opacity: 0;
+    transform: translateX(-170%) rotate(16deg);
+  }
+  18% { opacity: 0.85; }
+  100% {
+    opacity: 0;
+    transform: translateX(170%) rotate(16deg);
+  }
+}
+
+.intro-sweep {
+  animation: intro-sweep 2100ms 1150ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes intro-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+    filter: blur(7px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+.intro-rise {
+  animation: intro-rise 950ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.intro-d1 { animation-delay: 800ms; }
+.intro-d2 { animation-delay: 1050ms; }
+.intro-d3 { animation-delay: 1300ms; }
+.intro-d4 { animation-delay: 1550ms; }
+.intro-d5 { animation-delay: 1800ms; }
+.intro-d6 { animation-delay: 2050ms; }
+
+@keyframes intro-line {
+  from { transform: scaleX(0); opacity: 0; }
+  to { transform: scaleX(1); opacity: 1; }
+}
+
+.intro-line {
+  animation: intro-line 1200ms 1150ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes auth-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.auth-enter {
+  animation: auth-in 540ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.intro-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: #040308;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 560ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.intro-veil-active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *,
@@ -271,5 +410,16 @@ body {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+  }
+  .intro-mark,
+  .intro-rise,
+  .intro-sweep,
+  .intro-line,
+  .intro-orb {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
   }
 }

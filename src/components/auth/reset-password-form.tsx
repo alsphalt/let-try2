@@ -14,6 +14,7 @@ import {
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/input";
 import { validatePassword } from "@/lib/auth-validation";
+import { httpErrorMessage, readJson } from "@/lib/api-response";
 
 type ApiResponse = {
   ok?: boolean;
@@ -96,11 +97,11 @@ export function ResetPasswordForm({ token }: { token: string }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token, password, confirmPassword }),
       });
-      const data = (await response.json().catch(() => ({}))) as ApiResponse;
+      const data = (await readJson<ApiResponse>(response)) ?? {};
 
       if (!response.ok) {
         setFieldErrors(data.fields ?? {});
-        setFormError(data.message ?? "Could not reset the password.");
+        setFormError(data.message ?? httpErrorMessage(response.status));
         return;
       }
 

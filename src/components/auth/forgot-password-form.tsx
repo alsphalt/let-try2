@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/input";
 import { validateEmail } from "@/lib/auth-validation";
+import { httpErrorMessage, readJson } from "@/lib/api-response";
 
 type ApiResponse = {
   ok?: boolean;
@@ -51,11 +52,11 @@ export function ForgotPasswordForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
-      const data = (await response.json().catch(() => ({}))) as ApiResponse;
+      const data = (await readJson<ApiResponse>(response)) ?? {};
 
       if (!response.ok) {
         setFieldError(data.fields?.email ?? null);
-        setFormError(data.message ?? "Could not request a reset link.");
+        setFormError(data.message ?? httpErrorMessage(response.status));
         return;
       }
 

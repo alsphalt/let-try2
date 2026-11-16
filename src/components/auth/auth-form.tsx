@@ -23,6 +23,7 @@ import {
   type FieldErrors,
 } from "@/lib/auth-validation";
 import { cn } from "@/lib/cn";
+import { httpErrorMessage, readJson } from "@/lib/api-response";
 
 type Mode = "signin" | "signup";
 
@@ -114,11 +115,11 @@ export function AuthForm({ mode }: { mode: Mode }) {
         credentials: "same-origin",
       });
 
-      const data = (await response.json().catch(() => ({}))) as ApiResponse;
+      const data = (await readJson<ApiResponse>(response)) ?? {};
 
       if (!response.ok) {
         setFieldErrors(data.fields ?? {});
-        setFormError(data.message ?? "Something went wrong. Please try again.");
+        setFormError(data.message ?? httpErrorMessage(response.status));
         return;
       }
 

@@ -2,10 +2,11 @@
 
 An always-on hosting platform for messaging bots and internal automations.
 
-**Stage 02 — Identity.** Branding, the design system and the application shell
-are in place, and **accounts are live**: registration, sign-in, sign-out and
-password reset run against SQLite with scrypt-hashed passwords. Bot hosting,
-wallet operations and API keys are still to come.
+**Stage 02 — Identity.** Branding, the design system, the application shell and
+a cinematic introduction screen are in place, and **accounts are live**:
+registration, sign-in, sign-out and password reset run against SQLite with
+scrypt-hashed passwords. Bot hosting, wallet operations and API keys are still
+to come.
 
 > This is a standalone project. It does not import from, deploy with, or modify
 > the existing DARKNOTE bot project.
@@ -62,6 +63,7 @@ npm start
 | `/contact` | Contact layout with a non-sending form |
 | `/wallet` | Wallet section — Coming soon |
 | `/settings` | Live account, session and workspace settings |
+| `/welcome` | First-entry introduction with original startup sound |
 | `/login`, `/register` | Working sign-in / registration (session cookies) |
 | `/forgot-password`, `/reset-password` | Single-use password reset flow |
 | `/api/health` | Real runtime health, including database and email state |
@@ -87,6 +89,7 @@ src/
 │   ├── ui/                   # Button, card, badge, field, section
 │   ├── landing/              # Landing sections, live status panel
 │   ├── auth/                 # Sign-in, registration, recovery forms
+│   ├── welcome/              # Cinematic introduction screen
 │   └── app/                  # Shell, sidebar, topbar, page primitives
 ├── lib/                      # Client-safe helpers and site metadata
 └── server/
@@ -109,6 +112,24 @@ Deeper detail: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 - **Shape** — 8px controls, 16px cards, 24px feature panels.
 
 Tokens live in `src/app/globals.css`; the rendered reference is `/design`.
+
+## Introduction screen
+
+First-time visitors who open `/login` are routed to `/welcome`, a full-screen
+black-and-violet introduction with an animated logo, an original synthesized
+startup sound and a **Get Started** button. Get Started sets a 7-day
+`dn_intro_seen` cookie and transitions to the existing sign-in page.
+
+- The soundtrack is an original 5-second composition generated for this project
+  (`public/audio/darknote-startup.wav`) — no third-party samples.
+- Autoplay is attempted on mount. If the browser blocks it, playback starts on
+  the first pointer/key interaction; the header shows that state.
+- The sound switch persists as the `dn_sound` cookie, read server-side on the
+  next visit.
+- Signed-in visitors skip the introduction entirely: `/welcome` and `/login`
+  both redirect to `/dashboard` when a valid session exists.
+- `prefers-reduced-motion` disables the cinematic animation and reveals the
+  final composition.
 
 ## Authentication
 
@@ -143,6 +164,7 @@ first use.
 | Area | State |
 | --- | --- |
 | Branding, design system, responsive shell | Complete |
+| Introduction screen with original startup sound | Complete |
 | Marketing surfaces | Complete |
 | Application shell, five-section navigation, profile and notifications | Complete |
 | Registration, login, logout, sessions | Complete (SQLite + scrypt) |
@@ -157,3 +179,9 @@ Any Node host with a persistent disk works (`npm run build && npm start`), which
 is what the SQLite stage assumes. Serverless platforms with ephemeral storage
 need a hosted Postgres adapter before accounts will survive deployments. Keep
 `APP_URL` set to the public HTTPS origin so session cookies are marked `Secure`.
+
+**Moving a build between environments:** delete `.next` and rebuild after
+changing `node_modules`. Turbopack externalizes native packages such as
+`better-sqlite3`; a stale `.next` can keep a hash-qualified module name that no
+longer exists, making every auth route return HTTP 500. `better-sqlite3` and
+`nodemailer` are pinned in `serverExternalPackages` for this reason.

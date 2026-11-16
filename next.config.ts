@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   poweredByHeader: false,
+  serverExternalPackages: ["better-sqlite3", "nodemailer"],
   turbopack: {
     rules: {
       "*.css": {
